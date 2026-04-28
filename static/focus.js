@@ -19,7 +19,7 @@ async function run() {
 
 run();
 
-async function sendRequest(url) {
+function sendRequest(url) {
     return new Promise(function(resolve, reject) {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
