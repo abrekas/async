@@ -6,13 +6,20 @@ const API = {
 };
 
 async function run() {
+   
     const orgOgrns = await sendRequest(API.organizationList)
+    if (!orgOgrns) {
+        return;
+    } 
     const ogrns = orgOgrns.join(",");
     const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`)
-    const orgsMap = reqsToMap(requisites);
     const analytics = await sendRequest(`${API.analytics}?ogrn=${ogrns}`)
-    addInOrgsMap(orgsMap, analytics, "analytics");
     const buh = await sendRequest(`${API.buhForms}?ogrn=${ogrns}`)
+    if (!requisites || !analytics || !buh) {
+        return;
+    }
+    const orgsMap = reqsToMap(requisites);
+    addInOrgsMap(orgsMap, analytics, "analytics");
     addInOrgsMap(orgsMap, buh, "buhForms");
     render(orgsMap, orgOgrns);
 }
@@ -21,10 +28,13 @@ run();
 
 function sendRequest(url) {
   return fetch(url).then(response => {
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new Error();
     }
     return response.json();
+  }).catch(error => {
+    alert(error)
+    return null
   });
 }
 
